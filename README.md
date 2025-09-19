@@ -1,73 +1,50 @@
 # Food-Recommendation
 
-## Dataset Generation
-First, a simulated dataset of 100,000 food orders is generated using the Faker library. Each order includes a customer ID, order date, a main food item from categories like Pizza, Burger, or Pasta, and a random quantity. The total price is calculated based on a price range for each food category and the quantity.
+This document describes the creation of a food recommendation system using a synthetic dataset and three different machine learning models. The system aims to recommend complementary food items (like drinks or sides) based on a main food item, while also considering contextual factors.
 
-The script then randomly adds complementary items—a drink, side, starter, or dessert—based on a set probability for each category:
+## Dataset Generation 📝
+First, a synthetic dataset of 100,000 orders is created using the Faker library. Each order includes a MainItem (e.g., Pizza, Burger, Pasta) along with a randomized selection of complementary items such as a drink, side, starter, or dessert, which are added based on a set probability. The dataset also includes a CustomerID, OrderDate, quantity, and total_price.
 
-Drink: 60% chance of being added.
+To make the recommendations more context-aware, new features are added:
 
-Side: 50% chance of being added.
+Time features: The hour of the day, day of the week, and whether the order was on a weekend (IsWeekend) are extracted from the OrderDate.
 
-Starter: 40% chance of being added.
+Customer features: The number of past orders and the average spending for each customer are calculated to provide insights into their purchasing behavior.
 
-Dessert: 30% chance of being added.
-
-After generating the orders, the data is structured into a pandas DataFrame. Additional features are then created to enrich the dataset:
-
-Time-based features: The hour of the day, day of the week, and whether the order was placed on a weekend are extracted from the OrderDate.
-
-Customer-level features: The number of past orders and the average spending for each customer are calculated.
-
-## Recommendation Models
-The document explores three different methods for generating recommendations:
+## Recommendation Models 🧠
+The project uses three models to generate recommendations:
 
 ## 1. Item-Based Collaborative Filtering (Item-CF) 
-This method finds relationships between items by analyzing what people typically buy together. The process is as follows:
-
-Transaction Matrix: A binary matrix is created where each row represents a transaction (an order), and each column represents an item (e.g., 'Pepperoni Pizza,' 'Coke,' 'Fries'). A "1" indicates the item was in the order, and a "0" indicates it was not.
-
-Cosine Similarity: The similarity between every pair of items is calculated using cosine similarity. This measures how often items appear together in the same orders.
+This is the most straightforward approach. It identifies relationships between items by creating a matrix that shows how often items are purchased together. The similarity between items is then calculated using cosine similarity. To recommend a complementary item for a main_item, the model finds other items with the highest similarity scores and suggests them.
 
 
-Recommendations: To recommend items for a main item (e.g., 'Margherita' pizza), the model finds the items with the highest similarity scores and suggests them as complementary items.
+For 'Margherita' pizza, the recommendations are: 'Water', 'Fries', 'Soup', 'Pudding', 'Fanta', 'Orange Juice'.
+
+For 'Veg Kebab', the recommendations are: 'Lemonade', 'Mashed Potatoes', 'Garlic Mushrooms', 'Cake', 'Garlic Bread', 'Orange Juice'.
+
+For 'Fettuccine Alfredo', the recommendations are: 'Orange Juice', 'Salad', 'Garlic Mushrooms', 'Brownie', 'Lemonade', 'Mashed Potatoes'.
+
+## 2. Random Forest Classifier (Context-Aware) 
+This model goes beyond simple item pairings by incorporating contextual features. It is trained to predict the probability of a customer ordering a complementary item based on the MainItem, Hour, DayOfWeek, IsWeekend, PastOrders, and AvgSpend. A MultiOutputClassifier is used, as it can predict multiple complementary items at once.
+
+With specific context (hour=18, dayofweek=5, is_weekend=1, past_orders=10, avg_spend=20), the recommendations 
+
+For 'Margherita' are: 'Mashed Potatoes', 'Pepsi', 'Orange Juice', 'Fanta', 'Coke', 'Garlic Bread'.
+
+For 'Pepperoni Calzone' under the same context, the recommendations are: 'Orange Juice', 'Coke', 'Pepsi', 'Salad', 'Mashed Potatoes', 'Garlic Bread'.
+
+## 3. XGBoost Classifier (Context-Aware) 
+Similar to the Random Forest model, XGBoost is a powerful, context-aware algorithm used to make predictions. It is trained on the same features to predict the probability of complementary items.
+
+Under the same context as the Random Forest example, the recommendations 
+
+For 'Margherita' are: 'Orange Juice', 'Chicken Wings', 'Pepsi', 'Garlic Bread', 'Onion Rings', 'Garlic Mushrooms'.
+
+For 'Vegan Fish & Chips', the recommendations are: 'Ice Cream', 'Coke', 'Water', 'Fries', 'Onion Rings', 'Pepsi'.
+
+## Conclusion
+The project successfully demonstrates three distinct approaches to building a food recommendation system: a simple, association-based model (Item-CF) and two more advanced, context-aware machine learning models (Random Forest and XGBoost). Each model produces a different set of recommendations, highlighting the fact that including contextual features such as time and customer behavior can significantly alter the results. This makes the recommendations more personalized and potentially more accurate.
 
 
 
-Example: The model recommends 'Orange Juice,' 'Garlic Bread,' 'Spring Rolls,' 'Brownie,' 'Fries,' and 'Coke' for a Margherita pizza.
-
-## 2. Random Forest Classifier 
-This approach uses a machine learning model to predict which complementary items a customer is likely to purchase.
-
-
-Features: The model is trained on features like the MainItem, Hour, DayOfWeek, and IsWeekend. These features are one-hot encoded to be used by the model.
-
-
-Target: The target variable is the set of complementary items in each order. Since multiple items can be present, a 
-
-MultiLabelBinarizer is used to handle this.
-
-
-Model: A MultiOutputClassifier with a RandomForestClassifier is used, which is suitable for predicting multiple target labels at once.
-
-
-Training and Prediction: The model is trained on a portion of the data (X_train, Y_train). When a new 
-
-
-main_item is given, the model predicts the probability of each complementary item being chosen.
-
-Example: The model recommends 'Lemonade,' 'Fries,' 'Coke,' 'Pepsi,' 'Garlic Bread,' and 'Water' for a Margherita pizza.
-
-## 3. XGBoost Classifier (Optional) 
-This section introduces an alternative to the Random Forest model using XGBoost, a powerful gradient-boosting algorithm.
-
-
-Setup: The process is similar to the Random Forest model, using a MultiOutputClassifier with an XGBClassifier.
-
-
-Training and Prediction: The model is trained on the same features and target variables as the Random Forest model. It then predicts the probability of each complementary item for a given main item.
-
-
-Example: The model recommends 'Water,' 'Coke,' 'Pepsi,' 'Onion Rings,' 'Garlic Bread,' and 'Orange Juice' for a Margherita pizza.
-
-## All three models provide different, but valid, recommendations, demonstrating various approaches to solving the same problem.
+contextual features such as time and customer behavior can significantly alter the results. This makes the recommendations more personalized and potentially more accurate.
