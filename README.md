@@ -70,4 +70,4 @@ Training and Prediction: The model is trained on the same features and target va
 
 Example: The model recommends 'Water,' 'Coke,' 'Pepsi,' 'Onion Rings,' 'Garlic Bread,' and 'Orange Juice' for a Margherita pizza.
 
-All three models provide different, but valid, recommendations, demonstrating various approaches to solving the same problem.
+## All three models provide different, but valid, recommendations, demonstrating various approaches to solving the same problem.
