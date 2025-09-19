@@ -22,7 +22,7 @@ Customer-level features: The number of past orders and the average spending for 
 ## Recommendation Models
 The document explores three different methods for generating recommendations:
 
-1. Item-Based Collaborative Filtering (Item-CF) 
+## 1. Item-Based Collaborative Filtering (Item-CF) 
 This method finds relationships between items by analyzing what people typically buy together. The process is as follows:
 
 Transaction Matrix: A binary matrix is created where each row represents a transaction (an order), and each column represents an item (e.g., 'Pepperoni Pizza,' 'Coke,' 'Fries'). A "1" indicates the item was in the order, and a "0" indicates it was not.
